@@ -1,4 +1,4 @@
-We visit the provided URL [http://mercury.picoctf.net:1270/]("http://mercury.picoctf.net:1270/")
+We visit the provided URL [http://mercury.picoctf.net:1270/](http://mercury.picoctf.net:1270/)
 
 
 
