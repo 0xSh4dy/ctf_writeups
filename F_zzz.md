@@ -5,7 +5,7 @@ I used Ghidra to disassemble the binary.
 ![](https://github.com/r4ksh1t0011/CTF-Writeups/blob/pngs/flag.png)<br> 
 <br>
 
-Thus, we found the respective addresses where flag1 and flag2 are located. Now, we only need to extract the data from that address which can be done by exploiting the format string vulnerability. here's a simple script for it.
+Thus, we found the respective addresses where flag_1 and flag_2 are located. Now, we only need to extract the data from that address which can be done by exploiting the format string vulnerability. Here's a simple script for it.
 
 ```
 #!/usr/bin/env python
