@@ -1,3 +1,4 @@
+### Download the binary from here : https://github.com/0xSh4dy/CTF-Writeups/blob/file/brokecollegestudents
 ### There is a format string vulnerability in the catch() function. Also, PIE is enabled and there is a stack canary We can exploit the format string vulnerability to leak the stack canary and the base address of the elf
 ```
 #!/usr/bin/env python3
