@@ -55,7 +55,7 @@ frame.rip = syscall
 
 Now, we have created a Sigreturn frame. This would be used to set everything in order to call execve("/bin/sh\0",0,0). Refer to https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/ for more details on the Linux syscall table.
 
-Now, make a sys_rt_sigreturn syscall which would be used to execute the Sigreturn Frame created by us. popping 0xf into the rax register followed by a syscall and our sigreturn frame would spawn a shell
+Now, make a sys_rt_sigreturn syscall which would be used to execute the Sigreturn Frame created by us. To make that syscall, the value in the rax register must be 15 (or 0xf). So, use pop rax;ret gadget to do that.   popping 0xf into the rax register followed by a syscall and our sigreturn frame would spawn a shell
 ```
 payload += flat(pop_rax_ret,0xf,syscall,frame)
 p.sendline(payload)
