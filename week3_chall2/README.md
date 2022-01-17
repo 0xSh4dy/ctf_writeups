@@ -1,4 +1,4 @@
-<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/img1.png"/>
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/img.png"/>
 So, the program asks for a number. On reversing the binary, we can see that a buffer overflow will occur if the user inputs a certain number
 
 ```
