@@ -94,9 +94,11 @@ com/crh/lib/core/webview/JsWebView.java
 
 ### Analysis by VirusTotal ( https://www.virustotal.com/ )
 
-I uploaded the SHA256 of the apk to VirusTotal and got the following results:
+I uploaded the SHA256 of the apk to VirusTotal and got the following results: <br>
+<img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/ss1.png'/>
 Thus, many popular and renowned companies like Microsoft, Avast, Tencent, Kaspersky, etc. found. I searched about some of those 
 malwares.
+
 
 ```
 Android:Evo-gen [Trj] : The virus is a trojan. It is a malware designed to provide unauthorized, remote access to a user's device. Then can lead to other malware being installed on a machine, various data being stolen, or other malicious activities.
@@ -114,11 +116,10 @@ Trojan-Dropper.AndroidOS.Agent.sl : It installs applications invisibly to the us
 
 I used the android emulator provided by Google with the Android SDK and adb to perform dynamic analysis.
 
+<img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/fullCtrl.png'/>
 
-
-<!-- <img> -->
-
-If the user agrees, the malware would take full control of the device. After that, if we try to uninstall the Flash Player application, we fail. Even adb shell failed to uninstall the malicious app. Also, we cannot open the main activity after that. Also, we cannot view the app info after that. 
+If the user agrees, the malware would take full control of the device. After that, if we try to uninstall the Flash Player application, we fail. Even adb shell failed to uninstall the malicious app. Also, we cannot open the main activity after that. Also, we cannot view the app info after that. <br><br>
+<img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/notUninstall.png'/>
 
 In order to know more about network communications, I decided to perform some packet sniffing.
 
@@ -130,7 +131,7 @@ After capturing few packets, I opened the file in wireshark and found that the a
 
 1. The malware is able to track the user location.
 
-<!-- location image -->
+<img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/location.png'/> 
 
 2. After getting the initial permissions, the malware automatically accepts the remaining permissions.
 As seen from the logcat,
