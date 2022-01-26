@@ -118,7 +118,10 @@ I used the android emulator provided by Google with the Android SDK and adb to p
 
 <img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/fullCtrl.png'/>
 
-If the user agrees, the malware would take full control of the device. After that, if we try to uninstall the Flash Player application, we fail. Even adb shell failed to uninstall the malicious app. Also, we cannot open the main activity after that. Also, we cannot view the app info after that. <br><br>
+If the user agrees, the malware would take full control of the device. 
+After sometime, the app also asks for the following permission automatically and accepts some permissions like battery monitoring, call logs, etc. on its own.
+<img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/ss6.png'/>
+After that, if we try to uninstall the Flash Player application, we fail. Even adb shell failed to uninstall the malicious app. Also, we cannot open the main activity after that. Also, we cannot view the app info after that. <br><br>
 <img src='https://github.com/0xSh4dy/infosec_writeups/blob/images/notUninstall.png'/>
 
 In order to know more about network communications, I decided to perform some packet sniffing.
