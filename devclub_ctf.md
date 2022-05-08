@@ -3,9 +3,7 @@
 So, I'll be explaining the techniques used by me to solve various challenges in this interesting CTF.
 
 Lemme start with my second favorite category: Rev (the first one is pwn, obviously:p).
-
 <br><br>
-
 ## Reverse Engineering
 
 ## Challenge One : getargs
@@ -139,6 +137,7 @@ Now, find the address of `printFlag` which is 0x8049224. Modify a suitable instr
 
 ## Ten Little Phrases
 Similar to the previous challenge. Patch the binary using radare2, add a `jmp 0x80491a6` instruction where 0x80491a6 is the address of printFlag.
+
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_1.png">
 
-<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/getArgs_img2.png">
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_2.png">
