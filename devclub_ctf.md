@@ -3,7 +3,9 @@
 So, I'll be explaining the techniques used by me to solve various challenges in this interesting CTF.
 
 Lemme start with my second favorite category: Rev (the first one is pwn, obviously:p).
+
 <br><br>
+
 ## Reverse Engineering
 
 ## Challenge One : getargs
@@ -135,9 +137,73 @@ Now, find the address of `printFlag` which is 0x8049224. Modify a suitable instr
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/excessChars_img2.png">
 
-## Ten Little Phrases
+## Challenge3 :Ten Little Phrases
 Similar to the previous challenge. Patch the binary using radare2, add a `jmp 0x80491a6` instruction where 0x80491a6 is the address of printFlag.
-
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_1.png">
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_2.png">
+
+
+After dealing with all the three ELF reversing challenges, I decided to go with Winrev.
+<br><br>
+
+## Challenge4 : Payload
+So, in this challenge we were dealing with some kind of payload. The question asks for the resource name where the payload is located. So, i thought that some Resource related API function might have a major role in it. I explored through the dll using IDA Pro and found an interesting snippet
+
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/payload.png">
+```
+hResInfo = FindResourceW(::hModule, (LPCWSTR)0x66, L"asdasdasdasdsad");
+```
+Thus, the flag is `asdasdasdasdsad`
+
+
+## Challenge5: Mutex
+We just need to find the name of the mutex used by the malware. On decompiling the function
+`sub_10002300` we can find that
+```
+hObject = CreateMutexA(0, 0, "avcjkvcnmvcnmcvnmjdfkjfd");
+```
+which gives the mutex name as `avcjkvcnmvcnmcvnmjdfkjfd`
+
+
+## Challenge6: WhichAddress
+Here, we need to find which WINAPI function is send to CreateRemoteThreadAPI as a 4th parameter at location 0x10002174
+Peeking at this particular location using IDA Pro, we find he following code
+```
+hHandle = CreateRemoteThread(hProcess, 0, 0, lpStartAddress, lpAddress, 0, ThreadId);
+where,
+lpStartAddress = (LPTHREAD_START_ROUTINE)GetProcAddress(hModule, "LoadLibraryA");
+```
+So, `LoadLibraryA` is the required answer
+
+
+## Challenge7: Privileged
+Here, we have to find the token privileges gained by the malware. Again, we need to explore through the code using IDA Pro. I found a function `sub_100019a0` which contains
+```
+if ( OpenProcessToken(CurrentProcess, 0x28u, &TokenHandle) )
+  {
+    LookupPrivilegeValueA(0, "SeDebugPrivilege", &NewState.Privileges[0].Luid);
+    NewState.PrivilegeCount = 1;
+    NewState.Privileges[0].Attributes = 2;
+    AdjustTokenPrivileges(TokenHandle, 0, &NewState, 0, 0, 0);
+  }
+```
+So, it is clear that the token privilege gained by the malware is `SeDebugPrivilege`
+
+## Challenge8: DropThis
+Now, we need to find the file name of the dropped payload. On decompiling the function
+`sub_10002250`, we find that 
+```
+sub_10002B3B(a3, 260, "iexplore-1.dat"); 
+```                                     
+So, the filename is `iexplore-1.dat`
+
+
+## Challenge9: LevelUp
+Here, we need to find the process in which tries to inject the dropped payload. So, this is easy as well. Since the injected payload was iexplore-1.dat, I googled it to find the process name and luckily it came out to be `iexplore.exe` which is the flag.
+
+
+## Challenge10: SHA1
+I loaded the dll in the site https://manalyzer.org/ which gives various details including the SHA1 hash of dropped payload. Navigate to the resources section and get the hash
+
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/sha1.png">
