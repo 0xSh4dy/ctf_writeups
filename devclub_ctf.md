@@ -72,6 +72,7 @@ which gives the flag i.e `>Gf6SI-@1m`
 
 <br><br>
  </section>
+<section id="excess_chars">
   
 ## Challenge Two : Excess Chars
 Hmm, so here comes yet another interesting ELF reverse engineering challenge. In this case, it was a 32 bit binary, therefore I used IDA Pro to decompile it. 
@@ -137,17 +138,22 @@ Now, press V to enter visual mode and then press p to see the instructions. Navi
 Now, find the address of `printFlag` which is 0x8049224. Modify a suitable instruction, let's say `call sym.imp.putchar` to `jmp 0x8049224`. Press Enter and save it, and then quit. Run the binary to get the flag!
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/excessChars_img2.png">
+  </section>
+  
+<section id="ten_little_phrases">
 
-## Challenge3 :Ten Little Phrases
+  ## Challenge3 :Ten Little Phrases
 Similar to the previous challenge. Patch the binary using radare2, add a `jmp 0x80491a6` instruction where 0x80491a6 is the address of printFlag.
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_1.png">
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/10lill_2.png">
-
+  </section>
 
 After dealing with all the three ELF reversing challenges, I decided to go with Winrev.
 <br><br>
 
+<section id="payload">
+  
 ## Challenge4 : Payload
 So, in this challenge we were dealing with some kind of payload. The question asks for the resource name where the payload is located. So, i thought that some Resource related API function might have a major role in it. I explored through the dll using IDA Pro and found an interesting snippet
 
@@ -156,8 +162,10 @@ So, in this challenge we were dealing with some kind of payload. The question as
 hResInfo = FindResourceW(::hModule, (LPCWSTR)0x66, L"asdasdasdasdsad");
 ```
 Thus, the flag is `asdasdasdasdsad`
+  </section>
 
-
+<section id="mutex">
+  
 ## Challenge5: Mutex
 We just need to find the name of the mutex used by the malware. On decompiling the function
 `sub_10002300` we can find that
@@ -165,8 +173,9 @@ We just need to find the name of the mutex used by the malware. On decompiling t
 hObject = CreateMutexA(0, 0, "avcjkvcnmvcnmcvnmjdfkjfd");
 ```
 which gives the mutex name as `avcjkvcnmvcnmcvnmjdfkjfd`
-
-
+  </section>
+<section id="which_address">
+  
 ## Challenge6: WhichAddress
 Here, we need to find which WINAPI function is send to CreateRemoteThreadAPI as a 4th parameter at location 0x10002174
 Peeking at this particular location using IDA Pro, we find he following code
@@ -176,8 +185,9 @@ where,
 lpStartAddress = (LPTHREAD_START_ROUTINE)GetProcAddress(hModule, "LoadLibraryA");
 ```
 So, `LoadLibraryA` is the required answer
-
-
+  </section>
+<section id="privileged">
+  
 ## Challenge7: Privileged
 Here, we have to find the token privileges gained by the malware. Again, we need to explore through the code using IDA Pro. I found a function `sub_100019a0` which contains
 ```
@@ -190,7 +200,9 @@ if ( OpenProcessToken(CurrentProcess, 0x28u, &TokenHandle) )
   }
 ```
 So, it is clear that the token privilege gained by the malware is `SeDebugPrivilege`
-
+  </section>
+<section id="drop_this">
+  
 ## Challenge8: DropThis
 Now, we need to find the file name of the dropped payload. On decompiling the function
 `sub_10002250`, we find that 
@@ -198,20 +210,26 @@ Now, we need to find the file name of the dropped payload. On decompiling the fu
 sub_10002B3B(a3, 260, "iexplore-1.dat"); 
 ```                                     
 So, the filename is `iexplore-1.dat`
+  </section>
 
-
+<section id="level_up">
+  
 ## Challenge9: LevelUp
 Here, we need to find the process in which tries to inject the dropped payload. So, this is easy as well. Since the injected payload was iexplore-1.dat, I googled it to find the process name and luckily it came out to be `iexplore.exe` which is the flag.
+  </section>
 
-
+<section id="sha1">
+  
 ## Challenge10: SHA1
 I loaded the dll in the site https://manalyzer.org/ which gives various details including the SHA1 hash of dropped payload. Navigate to the resources section and get the hash
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/sha1.png">
-
+  </section>
 
 Now, let's move on to the Android category.
 
+<section id="pinbreak">
+  
 ## Challenge11: Pinbreak
 Here, we were provided an APK in which the primary language used for development was Java. So, we can use JADX-GUI to view the source code of the application. On analysing the code present in Main Activity, I found out that something was being loaded from the database via the `fetchPin()` function. This function looks as:
 ```
@@ -239,10 +257,10 @@ It gives us the cracked value: 9264
 After that, I ran the apk in an emulator. It asks for a pin, so I entered the pin `9264` and boom, got the flag!
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/pinbreak.png">
+  </section>
 
-
-<br><br>
-
+<section id="so_difficult">
+  
 ## Challenge12: soDifficult
 Without any doubt, I opened the provided one of the apks `app-x86_64-release.apk` in JADX and started reversing com.ctf.rev.MainActivity. So, there's a function named checkPassword which might be verifying some kind of password entered by the user via an EditText.
 
@@ -339,8 +357,10 @@ print(flag)
 On running this script, I got the flag
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/so_difficult_2.png">
+  </section>
 
-
+<section id="lit_part_2">
+  
 ## Challenge13: Lit-Part2
 So, this was yet another android reversing challenge but reversing this apk was pretty difficult because the code here was obfuscated. However, there had to be some way to solve it. I noticed a piece of code related to Firebase. I guessed, there might be something related to Firebase. I googled some stuff and found out that the android applications using firebase contain a specific url that contains `firebaseio` in it. I used apktool on the provided apk and then did a recursive grep to find out if such string exists. Luckily, I got something:
 ```
@@ -406,8 +426,10 @@ After that, I just randomly guessed about trying flag.json and got the flag:p
 `https://mongodb-e98ea-default-rtdb.firebaseio.com/flag.json`
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/lit2.png">
+  </section>
 
-
+<section id="lit_part_1">
+  
 ## Challenge14: LitPart1
 
 Hmm, I was do confused what to do now, since the /flag.json endpoint gives the flag for litPart2. So, I viewed the MainActivity once again, carefully. 
@@ -429,3 +451,4 @@ try {
 I wondered, what is the purpose of the string `rCpOr6eRlLDWW0pfAeQV/`. The slash at the end indicates that it might be an API endpoint. I confirmed it by doing more reversing and ultimately got the url https://mongodb-e98ea-default-rtdb.firebaseio.com/rCpOr6eRlLDWW0pfAeQV/. Now, I know that there exists a /.json endpoint. Open the link https://mongodb-e98ea-default-rtdb.firebaseio.com/rCpOr6eRlLDWW0pfAeQV/.json to get the flag.
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/lit1.png">
+  </section>
