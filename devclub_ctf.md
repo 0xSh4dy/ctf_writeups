@@ -195,7 +195,8 @@ Now, we need to find the file name of the dropped payload. On decompiling the fu
 `sub_10002250`, we find that 
 ```
 sub_10002B3B(a3, 260, "iexplore-1.dat"); 
-```                                     
+```                          
+This function was doing somekind of weird arithmetic on the buffer. So, I just guessed that it might be the correct answer and yeah, I was lucky:p
 So, the filename is `iexplore-1.dat`
 
 
