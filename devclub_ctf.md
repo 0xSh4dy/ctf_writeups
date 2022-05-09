@@ -3,11 +3,11 @@
 So, I'll be explaining the techniques used by me to solve various challenges in this interesting CTF.
 
 Lemme start with my second favorite category: Rev (the first one is pwn, obviously:p).
-
 <br><br>
 
 ## Reverse Engineering
 
+<section id="getargs">
 ## Challenge One : getargs
 So, starting with the `file` command, I found out that the provided file is an ELF 64 bit shared object, so it can be easily decompiled using IDA Freeware. So, I loaded the file in IDA and used the decompiler to get a good idea about the pseudo code. The following image shows the pseudo code. 
 
@@ -70,8 +70,8 @@ int main(){
 which gives the flag i.e `>Gf6SI-@1m`
 
 <br><br>
-
-
+ </section>
+  
 ## Challenge Two : Excess Chars
 Hmm, so here comes yet another interesting ELF reverse engineering challenge. In this case, it was a 32 bit binary, therefore I used IDA Pro to decompile it. 
 
