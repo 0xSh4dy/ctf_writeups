@@ -8,6 +8,7 @@ Lemme start with my second favorite category: Rev (the first one is pwn, obvious
 ## Reverse Engineering
 
 <section id="getargs">
+
 ## Challenge One : getargs
 So, starting with the `file` command, I found out that the provided file is an ELF 64 bit shared object, so it can be easily decompiled using IDA Freeware. So, I loaded the file in IDA and used the decompiler to get a good idea about the pseudo code. The following image shows the pseudo code. 
 
